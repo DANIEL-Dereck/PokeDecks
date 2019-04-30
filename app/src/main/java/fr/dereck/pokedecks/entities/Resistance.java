@@ -31,6 +31,6 @@ public class Resistance implements Serializable {
 
     @Override
     public String toString() {
-        return this.type + "x" + this.value;
+        return this.type + " " + this.value;
     }
 }

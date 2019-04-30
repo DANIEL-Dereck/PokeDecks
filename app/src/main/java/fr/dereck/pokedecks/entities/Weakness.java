@@ -31,6 +31,6 @@ public class Weakness implements Serializable {
 
     @Override
     public String toString() {
-        return this.type + "x" + this.value;
+        return this.type + " " + this.value;
     }
 }
