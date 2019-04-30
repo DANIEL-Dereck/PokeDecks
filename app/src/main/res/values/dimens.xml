@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Size -->
+    <dimen name="dimen0">0dp</dimen>
+    <dimen name="dimen4">4dp</dimen>
+    <dimen name="dimen8">8dp</dimen>
+    <dimen name="dimen12">12dp</dimen>
+    <dimen name="dimen24">24dp</dimen>
+    <dimen name="dimen48">48dp</dimen>
+    <dimen name="dimen96">96dp</dimen>
+    <!-- TextSize -->
+    <dimen name="txt_date">10sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>
