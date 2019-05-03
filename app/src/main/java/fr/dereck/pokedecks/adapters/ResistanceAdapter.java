@@ -9,7 +9,6 @@ import java.util.List;
 
 import fr.dereck.pokedecks.R;
 import fr.dereck.pokedecks.entities.Resistance;
-import fr.dereck.pokedecks.viewHolders.AttackViewHolder;
 import fr.dereck.pokedecks.viewHolders.StatsViewHolder;
 
 public class ResistanceAdapter extends RecyclerView.Adapter<StatsViewHolder> {

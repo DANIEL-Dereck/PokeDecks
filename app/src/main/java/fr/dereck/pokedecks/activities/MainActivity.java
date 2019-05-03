@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rv_main_list_card;
     private PokemonCardAdapter pokemonCardAdapter;
     private boolean onSearchInList = false;
+    private boolean inRequest = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,26 +90,31 @@ public class MainActivity extends AppCompatActivity {
                 int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
                 int itemsCount = gridLayoutManager.getItemCount();
 
-                if ((visibleCount + firstVisible) == itemsCount && !MainActivity.this.onSearchInList) {
+                if ((visibleCount + firstVisible) == itemsCount && !MainActivity.this.onSearchInList && !MainActivity.this.inRequest) {
+                    Log.d(TAG,String.format(" VisibleCount = %d | FirstVisible = %d | ItemsCount = %d", visibleCount, firstVisible, itemsCount));
+                    MainActivity.this.inRequest = true;
+
                     RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
                     StringRequest stringRequest = new StringRequest(Request.Method.GET, (AppUtil.APIURL + PokemonCard.API_CARDS + "?page=" + MainActivity.this.pageNumber),
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
-                                    try {
-                                        Log.d(TAG, "page " + MainActivity.this.pageNumber + "added");
-                                        MainActivity.this.pageNumber += 1;
+                                    MainActivity.this.pageNumber += 1;
+                                    Log.d(TAG, "page " + MainActivity.this.pageNumber + "added");
 
+                                    try {
                                         MainActivity.this.cards.addAll(new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class))));
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
 
                                     MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
+                                    MainActivity.this.inRequest = false;
                                 }
                             }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            MainActivity.this.inRequest = false;
                         }
                     });
 
@@ -160,9 +166,37 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            MainActivity.this.onSearchInList = true;
+            RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, (AppUtil.APIURL + PokemonCard.API_CARDS + "?name=" + query),
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            MainActivity.this.pageNumber += 1;
+                            Log.d(TAG, "page " + MainActivity.this.pageNumber + "added");
+                            List<PokemonCard> selectedCards = new ArrayList<>();
+
+                            try {
+                                selectedCards.addAll(new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class))));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            MainActivity.this.pokemonCardAdapter.clear();
+                            MainActivity.this.pokemonCardAdapter.addItems(selectedCards);
+                            MainActivity.this.inRequest = false;
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MainActivity.this.inRequest = false;
+                }
+            });
+
+            queue.add(stringRequest);
+
 
             MainActivity.this.pokemonCardAdapter.clear();
-            MainActivity.this.onSearchInList = true;
             for (PokemonCard card : cards) {
                 if (card.getName().toLowerCase().contains(query.toLowerCase())) {
                     MainActivity.this.pokemonCardAdapter.addItem(card);
