@@ -67,7 +67,7 @@ public class CardViewActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent1 = new Intent(CardViewActivity.this, FullScreenActivity.class);
-                    intent1.putExtra(FullScreenActivity.EXTRA_URL, CardViewActivity.this.selectedCard.getImageUrl());
+                    intent1.putExtra(FullScreenActivity.EXTRA_URL, CardViewActivity.this.selectedCard.getImageUrlHiRes());
                     CardViewActivity.this.startActivity(intent1);
                 }
             });

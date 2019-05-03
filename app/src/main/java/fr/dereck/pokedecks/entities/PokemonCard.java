@@ -15,6 +15,8 @@ public class PokemonCard implements Serializable {
     private String name;
     @SerializedName("imageUrl")
     private String imageUrl;
+    @SerializedName("imageUrlHiRes")
+    private String imageUrlHiRes;
     @SerializedName("hp")
     private String lifepoints;
     @SerializedName("types")
@@ -51,6 +53,14 @@ public class PokemonCard implements Serializable {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public void setImageUrlHiRes(String imageUrlHiRes) {
+        this.imageUrlHiRes = imageUrlHiRes;
+    }
+
+    public String getImageUrlHiRes() {
+        return imageUrlHiRes;
     }
 
     public void setImageUrl(String imageUrl) {
