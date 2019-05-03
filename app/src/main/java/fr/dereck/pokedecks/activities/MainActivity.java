@@ -4,13 +4,16 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.android.volley.Request;
@@ -20,6 +23,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.novoda.merlin.Connectable;
+import com.novoda.merlin.Disconnectable;
+import com.novoda.merlin.Merlin;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,9 +40,11 @@ import fr.dereck.pokedecks.adapters.PokemonCardAdapter;
 import fr.dereck.pokedecks.entities.PokemonCard;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
 
     private List<PokemonCard> cards = new ArrayList<>();
     private int pageNumber = 1;
+    private Merlin merlin;
 
     private RecyclerView rv_main_list_card;
     private PokemonCardAdapter pokemonCardAdapter;
@@ -47,6 +55,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
         this.initComponent();
+
+        this.merlin = new Merlin.Builder().withConnectableCallbacks().build(this);
+        this.merlin.registerDisconnectable(new Disconnectable() {
+            @Override
+            public void onDisconnect() {
+                String message = "Application deconnecter";
+                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this
+                        .findViewById(android.R.id.content)).getChildAt(0);
+
+
+                Snackbar snackbar = Snackbar.make(viewGroup,message,Snackbar.LENGTH_SHORT);
+                snackbar.show();            }
+        });
+
+        this.merlin.registerConnectable(new Connectable() {
+            @Override
+            public void onConnect() {
+                String message = "Application reconnecter";
+                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this
+                        .findViewById(android.R.id.content)).getChildAt(0);
+
+
+                Snackbar snackbar = Snackbar.make(viewGroup, message, Snackbar.LENGTH_SHORT);
+                snackbar.show();
+            }
+        });
 
         this.pokemonCardAdapter = new PokemonCardAdapter(this);
         this.initData();
@@ -70,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(String response) {
                                     try {
+                                        Log.d(TAG, "page " + MainActivity.this.pageNumber + "added");
                                         MainActivity.this.pageNumber += 1;
 
                                         MainActivity.this.cards.addAll(new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class))));
@@ -89,6 +124,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        merlin.bind();
+    }
+
+    @Override
+    protected void onPause() {
+        merlin.unbind();
+        super.onPause();
     }
 
     @Override
