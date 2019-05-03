@@ -56,15 +56,12 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
         this.initComponent();
 
-        this.merlin = new Merlin.Builder().withConnectableCallbacks().build(this);
+        this.merlin = new Merlin.Builder().withAllCallbacks().build(this);
         this.merlin.registerDisconnectable(new Disconnectable() {
             @Override
             public void onDisconnect() {
                 String message = "Application deconnecter";
-                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this
-                        .findViewById(android.R.id.content)).getChildAt(0);
-
-
+                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this.findViewById(android.R.id.content)).getChildAt(0);
                 Snackbar snackbar = Snackbar.make(viewGroup,message,Snackbar.LENGTH_SHORT);
                 snackbar.show();            }
         });
@@ -73,10 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onConnect() {
                 String message = "Application reconnecter";
-                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this
-                        .findViewById(android.R.id.content)).getChildAt(0);
-
-
+                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this.findViewById(android.R.id.content)).getChildAt(0);
                 Snackbar snackbar = Snackbar.make(viewGroup, message, Snackbar.LENGTH_SHORT);
                 snackbar.show();
             }
