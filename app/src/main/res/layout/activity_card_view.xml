@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@android:color/white"
+    android:background="@android:color/holo_red_light"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.CardViewActivity">
@@ -123,17 +123,17 @@
     <View
         android:id="@+id/separator"
         android:layout_width="wrap_content"
-        android:layout_height="5dp"
-        android:background="@android:color/black"
+        android:layout_height="10dp"
+        android:background="@drawable/bgpokemon"
         app:layout_constraintTop_toBottomOf="@id/guideline"
-        >
-
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
     </View>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/holo_red_light"
+        android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

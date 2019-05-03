@@ -1,10 +1,17 @@
 package fr.dereck.pokedecks.activities;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -36,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main);
         this.initComponent();
 
         this.pokemonCardAdapter = new PokemonCardAdapter(this);
@@ -56,10 +63,57 @@ public class MainActivity extends AppCompatActivity {
 
                 if ((visibleCount + firstVisible) == itemsCount) {
                     // TODO : add items with pagination
-//                    MainActivity.this.pokemonCardAdapter.addItems(null);
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        menu.findItem(R.id.search).setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+
+            MainActivity.this.pokemonCardAdapter.clear();
+            for (PokemonCard card : cards) {
+                if (card.getName().toLowerCase().contains(query.toLowerCase())) {
+                    MainActivity.this.pokemonCardAdapter.addItem(card);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.pokemonCardAdapter.getItemCount() != this.cards.size()) {
+            this.pokemonCardAdapter.setItems(this.cards);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void initComponent() {
@@ -73,15 +127,13 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        List<PokemonCard> result = new ArrayList<>();
-
                         try {
-                            result = Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class));
+                            MainActivity.this.cards = Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
-                        MainActivity.this.pokemonCardAdapter.setItems(result);
+                        MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
                     }
                 }, new Response.ErrorListener() {
             @Override

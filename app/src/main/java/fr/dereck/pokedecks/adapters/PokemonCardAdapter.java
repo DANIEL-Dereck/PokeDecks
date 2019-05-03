@@ -34,6 +34,11 @@ public class PokemonCardAdapter extends RecyclerView.Adapter<PokemonCardViewHold
         this.notifyDataSetChanged();
     }
 
+    public void clear() {
+        this.items.clear();
+        this.notifyDataSetChanged();
+    }
+
     public void addItems(List<PokemonCard> items) {
         this.items.addAll(items);
         this.notifyDataSetChanged();
