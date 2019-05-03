@@ -35,7 +35,6 @@ import fr.dereck.pokedecks.entities.PokemonCard;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<PokemonCard> newCards = new ArrayList<>();
     private List<PokemonCard> cards = new ArrayList<>();
     private int pageNumber = 1;
 
@@ -73,12 +72,11 @@ public class MainActivity extends AppCompatActivity {
                                     try {
                                         MainActivity.this.pageNumber += 1;
 
-                                        MainActivity.this.newCards = new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class)));
+                                        MainActivity.this.cards.addAll(new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class))));
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
 
-                                    MainActivity.this.cards.addAll(MainActivity.this.newCards);
                                     MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
                                 }
                             }, new Response.ErrorListener() {
