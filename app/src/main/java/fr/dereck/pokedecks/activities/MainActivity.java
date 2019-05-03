@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rv_main_list_card;
     private PokemonCardAdapter pokemonCardAdapter;
-    private boolean onsearchInList = false;
+    private boolean onSearchInList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +62,15 @@ public class MainActivity extends AppCompatActivity {
             public void onDisconnect() {
                 String message = "Application deconnecter";
                 final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this.findViewById(android.R.id.content)).getChildAt(0);
-                Snackbar snackbar = Snackbar.make(viewGroup,message,Snackbar.LENGTH_SHORT);
-                snackbar.show();            }
-        });
+                Snackbar.make(viewGroup,message,Snackbar.LENGTH_SHORT).show();
+        }});
 
         this.merlin.registerConnectable(new Connectable() {
             @Override
             public void onConnect() {
                 String message = "Application reconnecter";
                 final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) MainActivity.this.findViewById(android.R.id.content)).getChildAt(0);
-                Snackbar snackbar = Snackbar.make(viewGroup, message, Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                Snackbar.make(viewGroup, message, Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
                 int itemsCount = gridLayoutManager.getItemCount();
 
-                if ((visibleCount + firstVisible) == itemsCount && !MainActivity.this.onsearchInList) {
+                if ((visibleCount + firstVisible) == itemsCount && !MainActivity.this.onSearchInList) {
                     RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
                     StringRequest stringRequest = new StringRequest(Request.Method.GET, (AppUtil.APIURL + PokemonCard.API_CARDS + "?page=" + MainActivity.this.pageNumber),
                             new Response.Listener<String>() {
@@ -149,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                MainActivity.this.onsearchInList = false;
+                MainActivity.this.onSearchInList = false;
                 MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
                 return true;
             }
@@ -164,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
 
             MainActivity.this.pokemonCardAdapter.clear();
-            MainActivity.this.onsearchInList = true;
+            MainActivity.this.onSearchInList = true;
             for (PokemonCard card : cards) {
                 if (card.getName().toLowerCase().contains(query.toLowerCase())) {
                     MainActivity.this.pokemonCardAdapter.addItem(card);
@@ -202,7 +200,8 @@ public class MainActivity extends AppCompatActivity {
 
                         MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
                     }
-                }, new Response.ErrorListener() {
+                },
+                new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
             }
