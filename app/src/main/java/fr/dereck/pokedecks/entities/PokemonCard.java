@@ -112,7 +112,7 @@ public class PokemonCard implements Serializable {
 
         if (this.types != null) {
             for (String type : this.types) {
-                types += type + "";
+                types += type + " ";
             }
         }
 
