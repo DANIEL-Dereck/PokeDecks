@@ -72,7 +72,6 @@ public class CardViewActivity extends AppCompatActivity {
                 }
             });
 
-
             if (this.selectedCard.getAttacks() != null) {
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
                 this.attackAdapter = new AttackAdapter(this.selectedCard.getAttacks());
