@@ -35,10 +35,13 @@ import fr.dereck.pokedecks.entities.PokemonCard;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<PokemonCard> cards = new ArrayList<>();
+    private List<PokemonCard> newCards = new ArrayList<>();
+    private List<PokemonCard> cards = new ArrayList<>();
+    private int pageNumber = 1;
 
     private RecyclerView rv_main_list_card;
     private PokemonCardAdapter pokemonCardAdapter;
+    private boolean onsearchInList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +64,30 @@ public class MainActivity extends AppCompatActivity {
                 int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
                 int itemsCount = gridLayoutManager.getItemCount();
 
-                if ((visibleCount + firstVisible) == itemsCount) {
-                    // TODO : add items with pagination
+                if ((visibleCount + firstVisible) == itemsCount && !MainActivity.this.onsearchInList) {
+                    RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, (AppUtil.APIURL + PokemonCard.API_CARDS + "?page=" + MainActivity.this.pageNumber),
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    try {
+                                        MainActivity.this.pageNumber += 1;
+
+                                        MainActivity.this.newCards = new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class)));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    MainActivity.this.cards.addAll(MainActivity.this.newCards);
+                                    MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                        }
+                    });
+
+                    queue.add(stringRequest);
                 }
             }
         });
@@ -85,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                MainActivity.this.onsearchInList = false;
                 MainActivity.this.pokemonCardAdapter.setItems(MainActivity.this.cards);
                 return true;
             }
@@ -99,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
 
             MainActivity.this.pokemonCardAdapter.clear();
+            MainActivity.this.onsearchInList = true;
             for (PokemonCard card : cards) {
                 if (card.getName().toLowerCase().contains(query.toLowerCase())) {
                     MainActivity.this.pokemonCardAdapter.addItem(card);
@@ -123,12 +150,13 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, AppUtil.APIURL + PokemonCard.API_CARDS,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, AppUtil.APIURL + PokemonCard.API_CARDS + "?page=" + this.pageNumber,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            MainActivity.this.cards = Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class));
+                            MainActivity.this.pageNumber += 1;
+                            MainActivity.this.cards.addAll(new ArrayList<>(Arrays.asList(new Gson().fromJson(new JSONObject(response).getString("cards"), PokemonCard[].class))));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
